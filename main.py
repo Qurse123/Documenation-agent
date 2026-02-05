@@ -1,5 +1,5 @@
-from services.openai_service import chat
+from services.langchain_service import chain
 
-# Test the OpenAI connection
-response = chat("Hello! Say something nice.")
-print(response)
+response = chain.invoke({"question": "hello say something nice"}) 
+
+print(response.content)
