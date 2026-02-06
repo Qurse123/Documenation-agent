@@ -1,5 +1,7 @@
-from services.langchain_service import chain
+from services.agents import agent_executor
 
-response = chain.invoke({"question": "hello say something nice"}) 
+# Test the agent with a math question
+response = agent_executor.invoke({"messages": [("user", "What is 5 + 3?")]})
 
-print(response.content)
+# Print the last message (the agent's response)
+print(response["messages"][-1].content)
