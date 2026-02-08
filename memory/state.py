@@ -7,6 +7,12 @@ class Screenshot(TypedDict):
     description: str
 
 
+class AudioRecording(TypedDict):
+    path: str
+    timestamp: str
+    duration_seconds: float
+
+
 class DocAgentState(TypedDict):
     screenshots: List[str]  ## bunch of urls 
     transcript: str         ## voice transcipt  
