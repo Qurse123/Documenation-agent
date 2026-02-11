@@ -49,7 +49,7 @@ def _build_vision_messages(state: DocAgentState, prompt_text: str) -> list[Human
     """
     content: list[dict[str, Any]] = [{"type": "text", "text": prompt_text}]
 
-    for i, shot in enumerate[Screenshot](state["screenshots"]):
+    for i, shot in enumerate(state["screenshots"]):
         image_path = shot["path"]
         try:
             b64_image = _encode_image(image_path)
