@@ -14,7 +14,8 @@ class AudioRecording(TypedDict):
 
 
 class DocAgentState(TypedDict):
-    screenshots: List[str]  ## bunch of urls 
+    # Dict-like: use string key "screenshots" to get the list, then .append(captured) on that list.
+    screenshots: List[Screenshot]  ## list of Screenshot dicts (path, timestamp, description)
     transcript: str         ## voice transcipt  
     is_recording: bool      ## memory should presist only when is_recording is set to true    
     documentation: str      ## AI generated documenation based on screenshot + transcipt
