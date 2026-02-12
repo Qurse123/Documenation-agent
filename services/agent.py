@@ -28,16 +28,10 @@ class DocAgent:
 
     def __init__(self, screenshot_interval: float = 5.0):
         self._session_manager = SessionManager(screenshot_interval=screenshot_interval)
-        self._last_state: DocAgentState | None = None
 
     @property
     def is_recording(self) -> bool:
         return self._session_manager.is_recording
-
-    @property ## because of this now you can call last_state as agent.last_state instead of agent.last_state()
-    def last_state(self) -> DocAgentState | None:
-        """Access the last completed session state (for inspection/debugging)."""
-        return self._last_state
 
     async def start(self) -> None:
         """Start a documentation recording session."""
@@ -45,23 +39,22 @@ class DocAgent:
         await self._session_manager.start_session()
         logger.info("DocAgent: Session is live. Recording audio and capturing screenshots.")
 
-    async def stop(self) -> str:
+    async def stop(self) -> DocAgentState:
         """
         Stop the recording session and generate documentation.
 
         Returns:
-            Generated Markdown documentation string.
+            Completed DocAgentState with screenshots, transcript, and documentation.
         """
         logger.info("DocAgent: Stopping session...")
 
         # Stop recording and get accumulated state
         state = await self._session_manager.stop_session()
-        self._last_state = state
 
         logger.info(
             "DocAgent: Session data collected. %d screenshots, %d chars transcript.",
-            len(state["screenshots"]),
-            len(state["transcript"]),
+            len(state["screenshots"]), ## number of screenshots 
+            len(state["transcript"]), ## number of charcters in the transcipt
         )
 
         # Generate documentation from the session
@@ -72,7 +65,7 @@ class DocAgent:
         state["documentation"] = documentation
 
         logger.info("DocAgent: Documentation complete.")
-        return documentation
+        return state
 
     async def take_screenshot(self) -> None:
         """Manually trigger a screenshot during recording."""
