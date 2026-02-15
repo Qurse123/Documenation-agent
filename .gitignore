@@ -7,3 +7,11 @@ __pycache__/
 *$py.class
 .venv/
 venv/
+
+# Gradle
+.gradle/
+build/
+
+# Session data
+screenshots/
+audio/
