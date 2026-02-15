@@ -1,4 +1,3 @@
-import base64
 import logging
 from pathlib import Path
 from typing import Any
@@ -21,12 +20,6 @@ _loader: BaseLoader = FileSystemLoader(PROMPTS_DIR)
 jinja_env = Environment(loader=_loader)
 
 
-def _encode_image(image_path: str) -> str:
-    """Read an image file and return its base64 encoding."""
-    with open(image_path, "rb") as f:  #rb r = read b= binary as the function f 
-        return base64.b64encode(f.read()).decode("utf-8") #base64 is the module b64endcode is the fuction. f.read() willopen the image_path in binary and decode it as python string 
-
-
 def _build_prompt(state: DocAgentState) -> str:
     """Render the Jinja2 prompt template with session state data.
 
@@ -41,30 +34,27 @@ def _build_prompt(state: DocAgentState) -> str:
     )
 
 
-def _build_vision_messages(state: DocAgentState, prompt_text: str) -> list[HumanMessage]: ### I dont understand this function
+def _build_vision_messages(state: DocAgentState, prompt_text: str) -> list[HumanMessage]:
     """
     Build messages for the Vision API.
     Includes the text prompt and screenshot images so the LLM
     can actually see what was on screen.
+
+    Screenshots are already base64-encoded in memory (image_data field),
+    so no file I/O is needed here.
+    "screenshots" is a key dict that allows you to acess the list of screenshots in state.py
     """
     content: list[dict[str, Any]] = [{"type": "text", "text": prompt_text}]
 
     for i, shot in enumerate(state["screenshots"]):
-        image_path = shot["path"]
-        try:
-            b64_image = _encode_image(image_path)
-            content.append({
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/png;base64,{b64_image}",
-                    "detail": "low",
-                },
-            })
-            logger.debug("Attached screenshot %d: %s", i + 1, image_path)
-        except FileNotFoundError:
-            logger.warning("Screenshot not found, skipping: %s", image_path)
-        except Exception as e:
-            logger.error("Failed to encode screenshot %s: %s", image_path, e)
+        content.append({
+            "type": "image_url",
+            "image_url": {
+                "url": f"data:image/png;base64,{shot['image_data']}",
+                "detail": "low",
+            },
+        })
+        logger.debug("Attached screenshot %d (timestamp: %s)", i + 1, shot["timestamp"])
 
     return [HumanMessage(content=content)]  # type: ignore[arg-type]
 
