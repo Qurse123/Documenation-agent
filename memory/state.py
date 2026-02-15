@@ -2,7 +2,7 @@ from typing import TypedDict, List
 
 
 class Screenshot(TypedDict):
-    path: str
+    image_data: str              # Base64-encoded PNG image data (kept in memory, never saved to disk)
     timestamp: str
     description: str
 
