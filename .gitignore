@@ -15,3 +15,6 @@ build/
 # Session data
 screenshots/
 audio/
+
+# Notion OAuth tokens
+.notion_tokens.json
