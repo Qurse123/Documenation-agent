@@ -48,6 +48,7 @@ class SessionManager:
             "transcript": "",
             "is_recording": True,
             "documentation": "",
+            "notion_page_url": "",
         }
 
         # Start audio recording

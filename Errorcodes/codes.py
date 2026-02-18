@@ -19,6 +19,15 @@ TRANSCRIPTION_CONNECTION = "TRANSCRIPTION_004"
 TRANSCRIPTION_API_ERROR = "TRANSCRIPTION_005"
 TRANSCRIPTION_FILE_READ = "TRANSCRIPTION_006"
 
+# Notion error codes
+NOTION_NOT_CONFIGURED = "NOTION_001"
+NOTION_AUTH_CALLBACK_ERROR = "NOTION_002"
+NOTION_AUTH_CALLBACK_TIMEOUT = "NOTION_003"
+NOTION_AUTH_STATE_MISMATCH = "NOTION_004"
+NOTION_TOKEN_EXCHANGE_FAILED = "NOTION_005"
+NOTION_FILE_UPLOAD_FAILED = "NOTION_006"
+NOTION_PAGE_CREATION_FAILED = "NOTION_007"
+
 ERROR_MESSAGES = {
     AUDIO_NO_DEFAULT_MIC: (
         "No default microphone found. Please connect a microphone and set it as the default input."
@@ -46,6 +55,20 @@ ERROR_MESSAGES = {
     ),
     TRANSCRIPTION_API_ERROR: "OpenAI API error: {detail}",
     TRANSCRIPTION_FILE_READ: "Could not read audio file: {detail}",
+    # Notion errors
+    NOTION_NOT_CONFIGURED: (
+        "Notion credentials not configured. Add NOTION_CLIENT_ID and NOTION_CLIENT_SECRET to your .env file."
+    ),
+    NOTION_AUTH_CALLBACK_ERROR: "Notion authorization failed: {detail}",
+    NOTION_AUTH_CALLBACK_TIMEOUT: (
+        "Notion authorization timed out. No callback received within 120 seconds."
+    ),
+    NOTION_AUTH_STATE_MISMATCH: (
+        "Notion OAuth state mismatch — possible CSRF attack. Try again."
+    ),
+    NOTION_TOKEN_EXCHANGE_FAILED: "Notion token exchange failed: {detail}",
+    NOTION_FILE_UPLOAD_FAILED: "Failed to upload screenshot to Notion: {detail}",
+    NOTION_PAGE_CREATION_FAILED: "Failed to create Notion page: {detail}",
 }
 
 
