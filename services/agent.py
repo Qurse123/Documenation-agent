@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from managers.session_manager import SessionManager
 from services.doc_generator import generate_documentation
+from services.notion_service import publish_to_notion
 from memory.state import DocAgentState
 
 load_dotenv()
@@ -64,7 +65,12 @@ class DocAgent:
         # Store in state
         state["documentation"] = documentation
 
-        logger.info("DocAgent: Documentation complete.")
+        # Publish to Notion
+        logger.info("DocAgent: Publishing to Notion...")
+        page_url = await publish_to_notion(state)
+        state["notion_page_url"] = page_url
+
+        logger.info("DocAgent: Done. Notion page: %s", page_url)
         return state
 
     async def take_screenshot(self) -> None:
