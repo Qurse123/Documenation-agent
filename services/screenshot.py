@@ -1,25 +1,15 @@
-import base64
-from io import BytesIO
-from datetime import datetime
-from PIL import ImageGrab
+"""
+Screenshot Service (thin wrapper)
+==================================
+Delegates to the Stagehand browser service for page capture.
+Keeps the same async interface so session_manager.py doesn't need
+to import browser.py directly.
+"""
+
 from memory.state import Screenshot
+from services.browser import capture_page
 
 
-def capture_screenshot() -> Screenshot:
-    """
-    Capture the current screen and return it as in-memory base64 data.
-    Nothing is written to disk — the image stays in memory and flows
-    directly to the LLM and then to Notion.
-    """
-    image = ImageGrab.grab()
-
-    # Encode to PNG bytes in memory
-    buffer = BytesIO()
-    image.save(buffer, format="PNG")
-    b64_data = base64.b64encode(buffer.getvalue()).decode("utf-8")
-
-    return {
-        "image_data": b64_data,
-        "timestamp": datetime.now().isoformat(),
-        "description": "",
-    }
+async def capture_screenshot() -> Screenshot:
+    """Capture the current browser page via Stagehand."""
+    return await capture_page()
