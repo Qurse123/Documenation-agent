@@ -7,6 +7,7 @@ then generates docs and publishes to Notion.
 
 import asyncio
 import logging
+import signal
 import sys
 
 from services.agent import DocAgent
@@ -29,11 +30,11 @@ async def run() -> None:
     await agent.start()
     logger.info("Recording — press Ctrl+C to stop and generate documentation.")
 
-    try:
-        while True:
-            await asyncio.sleep(1)
-    except KeyboardInterrupt:
-        pass
+    stop_event = asyncio.Event() ## set a async event called stop_event this event is not set to start
+    loop = asyncio.get_running_loop() ## this gets the event loop running the async tasks
+    loop.add_signal_handler(signal.SIGINT, stop_event.set) ## we ammend the event loop to add something that intrupts the event loop and sets the event
+
+    await stop_event.wait() ## pause this async function until stop_event is set
 
     logger.info("Stopping session...")
     state = await agent.stop()
