@@ -51,7 +51,7 @@ async def upload_screenshot(image_data: str, index: int, access_token: str) -> s
     filename = f"screenshot_{index}.png"
     headers = _notion_headers(access_token)
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
         # Step 1: Create file upload object
         create_resp = await client.post(
             f"{NOTION_API_BASE}/file_uploads",
@@ -300,7 +300,7 @@ async def create_notion_page(
         "children": first_batch,
     }
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
         logger.info("Creating Notion page: '%s' (%d blocks)...", title, len(blocks))
         resp = await client.post(
             f"{NOTION_API_BASE}/pages",
