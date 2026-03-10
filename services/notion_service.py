@@ -23,7 +23,7 @@ from Errorcodes.codes import AppError
 logger = logging.getLogger(__name__)
 
 NOTION_API_BASE = "https://api.notion.com/v1"
-NOTION_VERSION = "2022-06-28"
+NOTION_VERSION = "2025-09-03"
 
 
 def _notion_headers(access_token: str) -> dict:
@@ -66,10 +66,10 @@ async def upload_screenshot(image_data: str, index: int, access_token: str) -> s
         upload_id = upload_obj["id"]
         upload_url = upload_obj.get("upload_url", f"{NOTION_API_BASE}/file_uploads/{upload_id}/send")
 
-        # Step 2: Send the actual file bytes
+        # Step 2: Send the actual file bytes (POST, not PATCH; don't set Content-Type — httpx handles multipart boundary)
         png_bytes = base64.b64decode(image_data)
-        send_resp = await client.patch(
-            upload_url,
+        send_resp = await client.post(
+            f"{NOTION_API_BASE}/file_uploads/{upload_id}/send",
             files={"file": (filename, png_bytes, "image/png")},
             headers={"Authorization": f"Bearer {access_token}", "Notion-Version": NOTION_VERSION},
         )
@@ -106,8 +106,8 @@ async def upload_all_screenshots(state: DocAgentState, access_token: str) -> dic
 """
 This is Regex or regular expression --> this will capture patterns in text to save
 In this case re.complie = reusable object basically intialzie your pattern detector then 
-r" is raw string \[ literal,  screenshot = match the word screenshot, \s+ = one or more spaces 
-(\d+) = capture 1 or more digit 
+r" is raw string, \\[ is literal bracket, screenshot matches the word, \\s+ is one or more spaces
+(\\d+) captures 1 or more digits
 
 so the pattern we are looking for should be:
 
@@ -253,7 +253,7 @@ def parse_markdown_to_blocks(
     return blocks
 
 # --- Page creation ---
-####Stopped here####
+
 def _extract_title(documentation: str) -> str:
     """Pull the first heading from the markdown as the page title."""
     for line in documentation.split("\n"):
@@ -283,11 +283,10 @@ async def create_notion_page(
     """
     headers = {**_notion_headers(access_token), "Content-Type": "application/json"}
 
-    # Build parent — if no parent specified, use workspace root
     if parent_page_id:
-        parent = {"type": "page_id", "page_id": parent_page_id}
+        parent: dict[str, Any] = {"type": "page_id", "page_id": parent_page_id}
     else:
-        logger.info("AH HA this is a message for later you to check line 209 in notion service")
+        parent = {"type": "workspace", "workspace": True}
     
     # Notion API limits children to 100 blocks per request
     first_batch = blocks[:100]
