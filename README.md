@@ -11,10 +11,9 @@ AI Documentation Agent
                       │
                       ▼
 ┌─────────────────────────────────────────────┐
-│  Screen/Voice Capture Layer                 │
-│  - Stagehand for browser interaction        │
-│  - Screenshot capture                       │
-│  - Audio transcription (Whisper?)           │
+│  Screen/Voice Capture Layer                 │          
+│  - Screenshot capture using pyautogui       │
+│  - Audio transcription using whisper        │
 └─────────────────────┬───────────────────────┘
                       │
                       ▼
