@@ -4,9 +4,9 @@ from datetime import datetime
 from typing import Optional
 
 from memory.state import DocAgentState, Screenshot
+from services import screenshot
 from services.screenshot import capture_screenshot
 from services.audio import start_recording, stop_recording, transcribe_audio
-from services import browser
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +52,8 @@ class SessionManager:
             "notion_page_url": "",
         }
 
-        # Launch browser session
-        await browser.start_session()
+        # Reset screenshot change detection state
+        screenshot.reset()
 
         # Start audio recording
         start_recording()
@@ -82,9 +82,6 @@ class SessionManager:
                 pass
             self._screenshot_task = None
 
-        # Close browser session
-        await browser.close_session()
-
         # Stop audio and get recording
         audio_recording = stop_recording()
 
@@ -112,6 +109,9 @@ class SessionManager:
             return None
 
         captured = await capture_screenshot()
+        if captured is None:
+            logger.debug("Manual screenshot skipped — no screen change.")
+            return None
         self._state["screenshots"].append(captured)
         logger.info("Manual screenshot captured. Total: %d", len(self._state["screenshots"]))
         return captured
@@ -121,7 +121,7 @@ class SessionManager:
         while self._is_running:
             try:
                 captured = await capture_screenshot()
-                if self._state is not None:
+                if captured is not None and self._state is not None:
                     self._state["screenshots"].append(captured)
                     logger.info(
                         "Screenshot #%d captured",
