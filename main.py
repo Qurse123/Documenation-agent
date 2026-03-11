@@ -4,7 +4,7 @@ Doc Agent — main entry point
 Starts a documentation session, records until Ctrl+C,
 then generates docs and publishes to Notion.
 """
-
+## working
 import asyncio
 import logging
 import signal
