@@ -10,10 +10,13 @@ from openai import (
     RateLimitError,
 )
 from dotenv import load_dotenv
+import logging
 import sounddevice as sd
 import numpy as np
 
 from memory.state import AudioRecording
+
+logger = logging.getLogger(__name__)
 from Errorcodes.codes import (
     AppError,
     AUDIO_NO_DEFAULT_MIC,
@@ -75,11 +78,24 @@ def start_recording() -> None:
         return  # Already recording
 
     _check_microphone_available()
+
+    device_info = sd.query_devices(kind="input") ## we are only quering for avaliable devices that are inputs eg microphones no speakers (outputs)
+    logger.info(
+        "Using input device: '%s' (index %s, %d ch, %.0f Hz)",
+        device_info.get("name", "unknown"),
+        device_info.get("index", "?"),
+        device_info.get("max_input_channels", 0),
+        device_info.get("default_samplerate", 0),
+        "CHECKING TO SEE IF MIC IS WORKING"
+    )
+
     _recording = True
     _frames = []
     _start_time = datetime.now()
 
     def callback(indata, frames, time, status):
+        if status: ## if status is truthy it will show you the status 
+            logger.warning("Audio callback status: %s", status)
         if _recording:
             _frames.append(indata.copy())
 
@@ -99,7 +115,7 @@ def start_recording() -> None:
         _stream = None
         raise AppError(AUDIO_START_RECORDING_GENERIC, detail=e) from e
 
-    print("Recording started...")
+    logger.info("Audio recording started.")
 
 
 def stop_recording() -> AudioRecording:
@@ -135,13 +151,23 @@ def stop_recording() -> AudioRecording:
 
     # Save as WAV file
     audio_data = np.concatenate(_frames, axis=0)
+
+    rms = float(np.sqrt(np.mean(audio_data ** 2)))
+    logger.info(
+        "Audio stats — duration: %.1fs, frames: %d, RMS level: %.6f %s",
+        duration,
+        len(_frames),
+        rms,
+        "(near-silent — check mic permissions)" if rms < 0.001 else "",
+    )
+
     with wave.open(filepath, 'wb') as wf:
         wf.setnchannels(_channels)
         wf.setsampwidth(2)  # 16-bit audio
         wf.setframerate(_sample_rate)
         wf.writeframes((audio_data * 32767).astype(np.int16).tobytes())
 
-    print(f"Recording saved to: {filepath}")
+    logger.info("Recording saved to: %s", filepath)
 
     return {
         "path": filepath,
