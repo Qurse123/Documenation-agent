@@ -1,0 +1,16 @@
+version: "0.0.1"
+organization: doc-agent
+
+apis:
+  api:
+    openapi: openapi/openapi.yaml
+
+generators:
+  groups:
+    local:
+      generators:
+        - name: fernapi/fern-fastapi-server
+          version: 0.0.80
+          output:
+            location: local-file-system
+            path: ../generated/server
