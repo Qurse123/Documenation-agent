@@ -15,7 +15,8 @@ You are given a voice transcript where a user narrates what they are doing on sc
 along with timestamped screenshots of their screen captured during the session.
 
 Your goal: produce a polished, step-by-step guide that a new employee, teammate, or
-external reader could follow to complete the same task independently.
+external reader could follow to complete the same task independently — even if they
+have never used the software or tools involved before.
 
 ---
 
@@ -37,30 +38,55 @@ the following structure:
 ### 1. Title
 A short, action-oriented title. Example: "How to Create a Gmail Account"
 
-### 2. Overview
-2-3 sentences summarizing what this guide covers and the end result.
+### 2. BLUF (Bottom Line Up Front)
+Write exactly 2-3 sentences using this pattern:
+- Sentence 1: "This guide shows you how to [specific action]."
+- Sentence 2: "You'll need this when [context or trigger — when would someone use this process]."
+- Sentence 3: "By the end, you will have [concrete, measurable outcome]."
 
-### 3. Prerequisites
-List anything the reader needs before starting (accounts, software, access, etc.).
+This must appear before everything else. The reader should know exactly what they
+will accomplish before reading a single step.
 
-### 4. Step-by-Step Instructions
+### 3. Metadata
+Infer and output the following fields from the transcript and screenshots:
+
+| Field | Value |
+|---|---|
+| **Objective** | One sentence describing what task this guide enables |
+| **Audience** | Who would use this guide (infer from context, tools, and domain) |
+| **Time Required** | Estimated time to complete (infer from session complexity and step count) |
+
+### 4. Prerequisites
+List anything the reader needs before starting (accounts, software, access, permissions, etc.).
+If none are required, write "None."
+
+### 5. Step-by-Step Instructions
 Numbered steps that walk the reader through the entire process.
-- Each step should be one clear action.
-- Reference screenshots using the exact format [Screenshot N] on its own line where they help clarify a step. For example, write [Screenshot 3] on a line by itself after the step it illustrates.
-- Include what to click, what to type, and where to look on screen.
+
+For each step:
+- State one clear action.
+- Describe exactly where to look and what to click, type, or select — include the name,
+  color, location, or label of the UI element so it is unambiguous.
+- Weave in context from the transcript to explain *why* this action is taken, not just *what* to do.
+- Reference the relevant screenshot using the exact format [Screenshot N] on its own line
+  after the step it illustrates.
+- Define any technical terms, jargon, or non-obvious concepts inline within the step.
 - If the user made a mistake and corrected it in the transcript, document only the correct path.
 
-### 5. Troubleshooting
+Self-sufficiency test: For each step, ask — could someone who has never used this
+software complete this step from your description alone? If not, add more context.
+
+### 6. Troubleshooting
 Note any issues the user mentioned, common mistakes, or things to watch out for.
 If none were mentioned, omit this section.
 
-### 6. Summary
+### 7. Summary
 One sentence confirming what the reader has accomplished after following this guide.
 
 ---
 
 Rules:
 - Write in second person ("Click the button", not "The user clicks the button").
-- Keep language simple and direct.
+- Keep language simple and direct. Define every piece of jargon inline — assume no domain knowledge.
 - Do not invent steps that are not supported by the transcript or screenshots.
 - Format output as clean Markdown.

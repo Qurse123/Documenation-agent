@@ -20,7 +20,7 @@ from memory.state import Screenshot
 logger = logging.getLogger(__name__)
 
 _prev_frame: Optional[np.ndarray] = None
-CHANGE_THRESHOLD = 0.05 ## subject to change if 5% of pixels have changed
+CHANGE_THRESHOLD = 0.02 ## subject to change if 5% of pixels have changed
 
 
 def _has_significant_change(current: np.ndarray, previous: np.ndarray) -> bool:
