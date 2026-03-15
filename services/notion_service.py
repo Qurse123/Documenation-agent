@@ -36,7 +36,7 @@ def _notion_headers(access_token: str) -> dict:
 
 # --- Screenshot upload ---
 
-async def upload_screenshot(image_data: str, index: int, access_token: str) -> str:
+async def upload_screenshot(image_data: str, index: int, access_token: str) -> str: ## this is a function not a class
     """
     Upload a single screenshot to Notion via the File Upload API.
 
@@ -49,12 +49,12 @@ async def upload_screenshot(image_data: str, index: int, access_token: str) -> s
         The file_upload ID to reference in image blocks.
     """
     filename = f"screenshot_{index}.png"
-    headers = _notion_headers(access_token)
+    headers = _notion_headers(access_token) ## this is used to authenticate the api request 
 
     async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
         # Step 1: Create file upload object
-        create_resp = await client.post(
-            f"{NOTION_API_BASE}/file_uploads",
+        create_resp = await client.post(  ## we are sending a post HTTP post request to the notion api
+            f"{NOTION_API_BASE}/file_uploads", ## this is the endpoint
             json={"filename": filename, "content_type": "image/png"},
             headers={**headers, "Content-Type": "application/json"},
         )
@@ -66,7 +66,7 @@ async def upload_screenshot(image_data: str, index: int, access_token: str) -> s
         upload_id = upload_obj["id"]
         upload_url = upload_obj.get("upload_url", f"{NOTION_API_BASE}/file_uploads/{upload_id}/send")
 
-        # Step 2: Send the actual file bytes (POST, not PATCH; don't set Content-Type — httpx handles multipart boundary)
+        # Step 2: Send the actual file bytes 
         png_bytes = base64.b64decode(image_data)
         send_resp = await client.post(
             f"{NOTION_API_BASE}/file_uploads/{upload_id}/send",
