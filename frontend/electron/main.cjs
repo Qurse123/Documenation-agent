@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen } = require("electron")
+const { app, BrowserWindow, screen, shell } = require("electron")
 
 function createWindow() {
   const { width } = screen.getPrimaryDisplay().workAreaSize
@@ -11,7 +11,7 @@ function createWindow() {
     frame: false,
     transparent: true,
     alwaysOnTop: true,
-    resizable: false,
+    resizable: true,
     skipTaskbar: true,
     webPreferences: {
       nodeIntegration: false,
@@ -20,6 +20,12 @@ function createWindow() {
   })
 
   win.setAlwaysOnTop(true, "screen-saver")
+
+  // Open all window.open() calls in the system default browser
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url)
+    return { action: "deny" }
+  })
 
   const isDev = !app.isPackaged
   if (isDev) {
