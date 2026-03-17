@@ -22,8 +22,28 @@ export default function App() {
         background: "#111113",
         border: "1px solid #1f1f23",
         borderRadius: 14,
-        padding: "24px 20px",
+        overflow: "hidden",
       }}>
+        {/* Drag handle — grab here to move the window */}
+        <div style={{
+          height: 28,
+          // @ts-expect-error Electron-specific CSS property
+          WebkitAppRegion: "drag",
+          cursor: "grab",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderBottom: "1px solid #1a1a1e",
+        }}>
+          <div style={{
+            width: 32,
+            height: 3,
+            borderRadius: 2,
+            background: "#2a2a2e",
+          }} />
+        </div>
+        <div style={{ padding: "20px 20px 24px", // @ts-expect-error Electron-specific CSS property
+          WebkitAppRegion: "no-drag" }}>
         <AnimatePresence mode="wait">
           {phase === "idle" && (
             <IdleScreen key="idle" startRecording={startRecording} error={error} />
@@ -38,6 +58,7 @@ export default function App() {
             <ReadyScreen key="ready" notionUrl={notionUrl} reset={reset} />
           )}
         </AnimatePresence>
+        </div>
       </div>
     </div>
   )
