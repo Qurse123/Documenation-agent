@@ -1,6 +1,9 @@
 import asyncio
+import logging
 import uuid
 from typing import Literal
+
+logging.basicConfig(level=logging.INFO)
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
