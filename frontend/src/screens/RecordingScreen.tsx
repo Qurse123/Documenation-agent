@@ -37,7 +37,7 @@ export function RecordingScreen({ stopRecording }: Props) {
         </span>
       </div>
 
-      <p style={{ fontSize: 13, color: "#71717A", margin: 0 }}>
+      <p style={{ fontSize: 13, color: "#666666", margin: 0 }}>
         Perform the actions you want documented.
       </p>
 
@@ -46,12 +46,12 @@ export function RecordingScreen({ stopRecording }: Props) {
         style={{
           width: "100%",
           background: "transparent",
-          color: "#FAFAFA",
+          color: "#111111",
           fontWeight: 500,
           fontSize: 14,
           height: 40,
           borderRadius: 8,
-          border: "1px solid #2a2a2e",
+          border: "1px solid #DDDDDD",
           cursor: "pointer",
         }}
       >
