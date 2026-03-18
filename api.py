@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import uuid
 from typing import Literal
 
@@ -91,4 +92,10 @@ async def get_status():
 async def get_result():
     if _state != "ready":
         raise HTTPException(status_code=404, detail="Result not ready yet")
-    return ResultResponse(**_result) ## ** unpacks dictionaries and * unpacks lists and tuples 
+    return ResultResponse(**_result) ## ** unpacks dictionaries and * unpacks lists and tuples
+
+
+@app.get("/notion/status")
+def notion_status():
+    configured = bool(os.getenv("NOTION_TOKEN"))
+    return {"configured": configured}

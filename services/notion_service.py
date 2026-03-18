@@ -11,6 +11,7 @@ Responsibilities:
 
 import base64
 import logging
+import os
 import re
 from typing import Any
 
@@ -359,8 +360,9 @@ async def publish_to_notion(state: DocAgentState) -> str:
     title = _extract_title(state["documentation"])
     blocks = parse_markdown_to_blocks(state["documentation"], screenshot_ids)
 
-    # Create the page
-    page_url = await create_notion_page(title, blocks, access_token)
+    # Create the page (use NOTION_PAGE_ID as parent if set)
+    parent_page_id = os.getenv("NOTION_PAGE_ID") or None
+    page_url = await create_notion_page(title, blocks, access_token, parent_page_id=parent_page_id)
 
     logger.info("Documentation published to Notion: %s", page_url)
     return page_url
