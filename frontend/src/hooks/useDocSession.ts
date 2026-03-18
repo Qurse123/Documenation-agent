@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react"
-import { startSession, stopSession, getStatus, getResult } from "@/lib/api"
+import { startSession, stopSession, getStatus, getResult, getNotionStatus } from "@/lib/api"
 
 export type Phase = "idle" | "recording" | "generating" | "ready"
 
@@ -7,6 +7,7 @@ export interface DocSessionState {
   phase: Phase
   notionUrl: string
   error: string | null
+  notionReady: boolean | null
   startRecording: () => Promise<void>
   stopRecording: () => Promise<void>
   reset: () => void
@@ -16,7 +17,14 @@ export function useDocSession(): DocSessionState {
   const [phase, setPhase] = useState<Phase>("idle")
   const [notionUrl, setNotionUrl] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [notionReady, setNotionReady] = useState<boolean | null>(null)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    getNotionStatus()
+      .then(({ configured }) => setNotionReady(configured))
+      .catch(() => setNotionReady(false))
+  }, [])
 
   useEffect(() => {
     if (phase !== "generating") return
@@ -68,5 +76,5 @@ export function useDocSession(): DocSessionState {
     setError(null)
   }, [])
 
-  return { phase, notionUrl, error, startRecording, stopRecording, reset }
+  return { phase, notionUrl, error, notionReady, startRecording, stopRecording, reset }
 }
