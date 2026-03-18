@@ -48,7 +48,7 @@ export function ReadyScreen({ notionUrl, reset }: Props) {
         <p style={{
           fontFamily: "'Instrument Serif', serif",
           fontSize: 18,
-          color: "#FAFAFA",
+          color: "#111111",
           margin: 0,
         }}>
           Documentation ready
@@ -78,7 +78,7 @@ export function ReadyScreen({ notionUrl, reset }: Props) {
         variant="ghost"
         style={{
           width: "100%",
-          color: "#52525B",
+          color: "#888888",
           fontSize: 13,
           height: 36,
           borderRadius: 8,

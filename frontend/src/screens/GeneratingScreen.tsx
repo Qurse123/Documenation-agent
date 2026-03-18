@@ -22,13 +22,13 @@ export function GeneratingScreen() {
       <p style={{
         fontFamily: "'Instrument Serif', serif",
         fontSize: 20,
-        color: "#FAFAFA",
+        color: "#111111",
         margin: 0,
       }}>
         Building your docs…
       </p>
 
-      <div style={{ height: 2, background: "#1f1f23", borderRadius: 2, overflow: "hidden" }}>
+      <div style={{ height: 2, background: "#E5E5E5", borderRadius: 2, overflow: "hidden" }}>
         <motion.div
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -36,7 +36,7 @@ export function GeneratingScreen() {
         />
       </div>
 
-      <p style={{ fontSize: 12, color: "#3f3f46", margin: 0, fontFamily: "'DM Mono', monospace" }}>
+      <p style={{ fontSize: 12, color: "#888888", margin: 0, fontFamily: "'DM Mono', monospace" }}>
         This may take a moment…
       </p>
     </motion.div>

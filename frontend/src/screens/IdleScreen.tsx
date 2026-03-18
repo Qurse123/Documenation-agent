@@ -18,13 +18,13 @@ export function IdleScreen({ startRecording, error }: Props) {
       <p style={{
         fontFamily: "'Instrument Serif', serif",
         fontSize: 20,
-        color: "#FAFAFA",
+        color: "#111111",
         margin: 0,
         lineHeight: 1.2,
       }}>
         Doc Agent
       </p>
-      <p style={{ fontSize: 13, color: "#71717A", margin: 0 }}>
+      <p style={{ fontSize: 13, color: "#666666", margin: 0 }}>
         Record your screen. Get documentation.
       </p>
 

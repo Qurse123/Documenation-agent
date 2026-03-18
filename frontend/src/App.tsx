@@ -12,15 +12,11 @@ export default function App() {
     <div style={{
       minHeight: "100vh",
       display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: 16,
+      alignItems: "stretch",
     }}>
       <div style={{
         width: "100%",
-        maxWidth: 320,
-        background: "#111113",
-        border: "1px solid #1f1f23",
+        background: "#F5F5F5",
         borderRadius: 14,
         overflow: "hidden",
       }}>
@@ -33,13 +29,12 @@ export default function App() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          borderBottom: "1px solid #1a1a1e",
         }}>
           <div style={{
             width: 32,
             height: 3,
             borderRadius: 2,
-            background: "#2a2a2e",
+            background: "#C0C0C5",
           }} />
         </div>
         <div style={{ padding: "20px 20px 24px", // @ts-expect-error Electron-specific CSS property
