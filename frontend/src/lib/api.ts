@@ -26,3 +26,7 @@ export function getStatus(): Promise<{ state: SessionState }> {
 export function getResult(): Promise<{ notion_url: string; documentation_markdown: string }> {
   return request("/session/result")
 }
+
+export function getNotionStatus(): Promise<{ configured: boolean }> {
+  return request("/notion/status")
+}

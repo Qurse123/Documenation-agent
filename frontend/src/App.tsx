@@ -6,7 +6,7 @@ import { GeneratingScreen } from "@/screens/GeneratingScreen"
 import { ReadyScreen } from "@/screens/ReadyScreen"
 
 export default function App() {
-  const { phase, notionUrl, error, startRecording, stopRecording, reset } = useDocSession()
+  const { phase, notionUrl, error, notionReady, startRecording, stopRecording, reset } = useDocSession()
 
   return (
     <div style={{
@@ -41,7 +41,7 @@ export default function App() {
           WebkitAppRegion: "no-drag" }}>
         <AnimatePresence mode="wait">
           {phase === "idle" && (
-            <IdleScreen key="idle" startRecording={startRecording} error={error} />
+            <IdleScreen key="idle" startRecording={startRecording} error={error} notionReady={notionReady} />
           )}
           {phase === "recording" && (
             <RecordingScreen key="recording" stopRecording={stopRecording} />

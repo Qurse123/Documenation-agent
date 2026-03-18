@@ -4,9 +4,30 @@ import { Button } from "@/components/ui/button"
 interface Props {
   startRecording: () => Promise<void>
   error: string | null
+  notionReady: boolean | null
 }
 
-export function IdleScreen({ startRecording, error }: Props) {
+function NotionStatusRow({ notionReady }: { notionReady: boolean | null }) {
+  const dot =
+    notionReady === null ? "#C0C0C5" : notionReady ? "#22C55E" : "#EF4444"
+  const label =
+    notionReady === null
+      ? "Checking Notion…"
+      : notionReady
+      ? "Notion ready"
+      : "Add NOTION_TOKEN to .env"
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ width: 7, height: 7, borderRadius: "50%", background: dot, flexShrink: 0 }} />
+      <span style={{ fontSize: 12, color: "#888888", fontFamily: "'DM Mono', monospace" }}>
+        {label}
+      </span>
+    </div>
+  )
+}
+
+export function IdleScreen({ startRecording, error, notionReady }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -28,6 +49,8 @@ export function IdleScreen({ startRecording, error }: Props) {
         Record your screen. Get documentation.
       </p>
 
+      <NotionStatusRow notionReady={notionReady} />
+
       {error && (
         <p style={{
           fontSize: 12,
@@ -44,16 +67,17 @@ export function IdleScreen({ startRecording, error }: Props) {
 
       <Button
         onClick={startRecording}
+        disabled={notionReady !== true}
         style={{
           width: "100%",
-          background: "#F59E0B",
-          color: "#0D0D0F",
+          background: notionReady === true ? "#F59E0B" : "#E5E5E5",
+          color: notionReady === true ? "#0D0D0F" : "#AAAAAA",
           fontWeight: 600,
           fontSize: 14,
           height: 40,
           borderRadius: 8,
           border: "none",
-          cursor: "pointer",
+          cursor: notionReady === true ? "pointer" : "not-allowed",
           marginTop: 4,
         }}
       >
