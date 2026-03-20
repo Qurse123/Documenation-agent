@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
-    "dist": "electron-builder --mac"
+    "dist": "electron-builder --mac --publish never"
   },
   "build": {
     "appId": "com.docagent.app",
