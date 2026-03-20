@@ -9,7 +9,23 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\""
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "dist": "electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.docagent.app",
+    "productName": "Doc Agent",
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.productivity"
+    },
+    "dmg": {
+      "title": "Doc Agent"
+    }
   },
   "dependencies": {
     "@radix-ui/react-progress": "^1.1.8",
@@ -40,6 +56,7 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.0.0",
-    "wait-on": "^9.0.4"
+    "wait-on": "^9.0.4",
+    "electron-builder": "^25.0.0"
   }
 }

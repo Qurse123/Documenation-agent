@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Validate backend before packaging — can't ship a broken Python backend
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install uv
+      - run: uv pip install -r requirements.txt --system
+      # test_screenshot.py excluded: requires a real display; excluded for parity with CI
+      - run: pytest tests/test_errorcodes.py tests/test_notion_service.py tests/test_doc_generator.py -v
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      # Smoke check + build frontend
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run lint
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+
+      # Package the Electron app as a .dmg (pinned via devDependencies)
+      - run: npm run dist
+        working-directory: frontend
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload .dmg to the GitHub Release created from the tag
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: frontend/dist/*.dmg

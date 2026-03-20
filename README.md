@@ -43,6 +43,21 @@ The app opens as a floating overlay. The Notion status dot turns green once your
 
 ---
 
+## Releasing
+
+1. Ensure all changes are merged to `main` and CI is green.
+2. Create and push a version tag:
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+3. GitHub Actions builds and packages the macOS `.dmg` automatically.
+4. The release appears at your repo's **Releases** page.
+
+> **Note:** The `.dmg` ships the Electron frontend. Users also need to run the Python backend locally (`uvicorn api:app --reload`). The app connects to `http://localhost:8000`.
+
+---
+
 ## Architecture
 
 ```
