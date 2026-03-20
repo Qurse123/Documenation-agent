@@ -1,3 +1,9 @@
+# Testing & linting
+pytest>=8.0
+pytest-asyncio>=0.23
+ruff>=0.4.0
+
+# Dependencies
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.12.1

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader, BaseLoader
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
-from memory.state import DocAgentState, Screenshot
+from memory.state import DocAgentState
 
 load_dotenv()
 

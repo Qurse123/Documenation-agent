@@ -12,7 +12,6 @@ the process host and log stream.
 import asyncio
 import logging
 import sys
-from services.agent import DocAgent
 
 
 def setup_logging() -> None:
@@ -27,8 +26,6 @@ def setup_logging() -> None:
 
 async def main() -> None:
     logger = logging.getLogger("worker")
-
-    agent = DocAgent(screenshot_interval=5.0)
 
     logger.info("Doc Agent worker started. Waiting for session triggers...")
 

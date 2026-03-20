@@ -65,7 +65,6 @@ async def upload_screenshot(image_data: str, index: int, access_token: str) -> s
 
         upload_obj = create_resp.json()
         upload_id = upload_obj["id"]
-        upload_url = upload_obj.get("upload_url", f"{NOTION_API_BASE}/file_uploads/{upload_id}/send")
 
         # Step 2: Send the actual file bytes 
         png_bytes = base64.b64decode(image_data)

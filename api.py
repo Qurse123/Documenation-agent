@@ -1,16 +1,15 @@
-import asyncio
 import logging
 import os
 import uuid
 from typing import Literal
-
-logging.basicConfig(level=logging.INFO)
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from services.agent import DocAgent
+
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(title="Doc Agent API")
 
