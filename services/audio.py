@@ -1,22 +1,20 @@
+import logging
 import os
 import wave
 from datetime import datetime
 from typing import Optional
+
+import numpy as np
+import sounddevice as sd
+from dotenv import load_dotenv
 from openai import (
-    APIError,
     APIConnectionError,
+    APIError,
     AuthenticationError,
     OpenAI,
     RateLimitError,
 )
-from dotenv import load_dotenv
-import logging
-import sounddevice as sd
-import numpy as np
 
-from memory.state import AudioRecording
-
-logger = logging.getLogger(__name__)
 from Errorcodes.codes import (
     AppError,
     AUDIO_NO_DEFAULT_MIC,
@@ -32,8 +30,11 @@ from Errorcodes.codes import (
     TRANSCRIPTION_API_ERROR,
     TRANSCRIPTION_FILE_READ,
 )
+from memory.state import AudioRecording
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 # Directory to save audio files
 AUDIO_DIR = "audio"
