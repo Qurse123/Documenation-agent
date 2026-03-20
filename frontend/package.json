@@ -2,6 +2,12 @@
   "name": "frontend",
   "private": true,
   "version": "0.0.0",
+  "description": "Doc Agent desktop frontend",
+  "author": "Qurse123",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Qurse123/Documenation-agent.git"
+  },
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -10,7 +16,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
-    "dist": "electron-builder --mac"
+    "dist": "electron-builder --mac --publish never"
   },
   "build": {
     "appId": "com.docagent.app",
@@ -25,6 +31,11 @@
     },
     "dmg": {
       "title": "Doc Agent"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "Qurse123",
+      "repo": "Documenation-agent"
     }
   },
   "dependencies": {
