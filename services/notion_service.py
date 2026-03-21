@@ -9,6 +9,7 @@ Responsibilities:
     - Create a Notion page with text and image blocks in the right places
 """
 
+import asyncio
 import base64
 import logging
 import os
@@ -19,12 +20,13 @@ import httpx
 
 from memory.state import DocAgentState
 from services.notion_auth import authenticate
-from Errorcodes.codes import AppError
+from Errorcodes.codes import AppError, NOTION_FILE_UPLOAD_FAILED, NOTION_PAGE_CREATION_FAILED
 
 logger = logging.getLogger(__name__)
 
 NOTION_API_BASE = "https://api.notion.com/v1"
 NOTION_VERSION = "2025-09-03"
+NOTION_BLOCK_BATCH_SIZE = 100
 
 
 def _notion_headers(access_token: str) -> dict:
@@ -37,7 +39,7 @@ def _notion_headers(access_token: str) -> dict:
 
 # --- Screenshot upload ---
 
-async def upload_screenshot(image_data: str, index: int, access_token: str) -> str: ## this is a function not a class
+async def upload_screenshot(image_data: str, index: int, access_token: str, client: httpx.AsyncClient) -> str:
     """
     Upload a single screenshot to Notion via the File Upload API.
 
@@ -45,57 +47,62 @@ async def upload_screenshot(image_data: str, index: int, access_token: str) -> s
         image_data: Base64-encoded PNG data.
         index: Screenshot number (for the filename).
         access_token: Notion OAuth access token.
+        client: Shared httpx AsyncClient.
 
     Returns:
         The file_upload ID to reference in image blocks.
     """
     filename = f"screenshot_{index}.png"
-    headers = _notion_headers(access_token) ## this is used to authenticate the api request 
+    headers = _notion_headers(access_token)
 
-    async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
-        # Step 1: Create file upload object
-        create_resp = await client.post(  ## we are sending a post HTTP post request to the notion api
-            f"{NOTION_API_BASE}/file_uploads", ## this is the endpoint
-            json={"filename": filename, "content_type": "image/png"},
-            headers={**headers, "Content-Type": "application/json"},
-        )
+    # Step 1: Create file upload object
+    create_resp = await client.post(
+        f"{NOTION_API_BASE}/file_uploads",
+        json={"filename": filename, "content_type": "image/png"},
+        headers={**headers, "Content-Type": "application/json"},
+    )
 
-        if create_resp.status_code != 200:
-            raise AppError("NOTION_008", detail=f"Create failed: {create_resp.status_code} {create_resp.text}")
+    if create_resp.status_code != 200:
+        raise AppError(NOTION_FILE_UPLOAD_FAILED, detail=f"Create failed: {create_resp.status_code} {create_resp.text}")
 
-        upload_obj = create_resp.json()
-        upload_id = upload_obj["id"]
+    upload_obj = create_resp.json()
+    upload_id = upload_obj["id"]
 
-        # Step 2: Send the actual file bytes 
-        png_bytes = base64.b64decode(image_data)
-        send_resp = await client.post(
-            f"{NOTION_API_BASE}/file_uploads/{upload_id}/send",
-            files={"file": (filename, png_bytes, "image/png")},
-            headers={"Authorization": f"Bearer {access_token}", "Notion-Version": NOTION_VERSION},
-        )
+    # Step 2: Send the actual file bytes
+    png_bytes = base64.b64decode(image_data)
+    send_resp = await client.post(
+        f"{NOTION_API_BASE}/file_uploads/{upload_id}/send",
+        files={"file": (filename, png_bytes, "image/png")},
+        headers=headers,
+    )
 
-        if send_resp.status_code != 200:
-            raise AppError("NOTION_008", detail=f"Send failed: {send_resp.status_code} {send_resp.text}")
+    if send_resp.status_code != 200:
+        raise AppError(NOTION_FILE_UPLOAD_FAILED, detail=f"Send failed: {send_resp.status_code} {send_resp.text}")
 
-        logger.info("Uploaded screenshot %d to Notion (file_upload: %s)", index, upload_id)
-        return upload_id
+    logger.info("Uploaded screenshot %d to Notion (file_upload: %s)", index, upload_id)
+    return upload_id
 
 
 async def upload_all_screenshots(state: DocAgentState, access_token: str) -> dict[int, str]:
     """
-    Upload all screenshots from the session to Notion.
+    Upload all screenshots from the session to Notion in parallel.
 
     Returns:
         Dict mapping screenshot number (1-based) to Notion file_upload ID.
     """
-    upload_ids: dict[int, str] = {}
+    async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
+        tasks = [
+            upload_screenshot(shot["image_data"], i + 1, access_token, client)
+            for i, shot in enumerate(state["screenshots"])
+        ]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
 
-    for i, shot in enumerate(state["screenshots"]):
-        try:
-            upload_id = await upload_screenshot(shot["image_data"], i + 1, access_token)
-            upload_ids[i + 1] = upload_id
-        except Exception as e:
-            logger.error("Failed to upload screenshot %d: %s", i + 1, e)
+    upload_ids: dict[int, str] = {}
+    for i, result in enumerate(results):
+        if isinstance(result, BaseException):
+            logger.error("Failed to upload screenshot %d: %s", i + 1, result)
+        else:
+            upload_ids[i + 1] = result
 
     logger.info("Uploaded %d / %d screenshots to Notion.", len(upload_ids), len(state["screenshots"]))
     return upload_ids
@@ -288,9 +295,9 @@ async def create_notion_page(
     else:
         parent = {"type": "workspace", "workspace": True}
     
-    # Notion API limits children to 100 blocks per request
-    first_batch = blocks[:100]
-    remaining = blocks[100:]
+    # Notion API limits children to NOTION_BLOCK_BATCH_SIZE blocks per request
+    first_batch = blocks[:NOTION_BLOCK_BATCH_SIZE]
+    remaining = blocks[NOTION_BLOCK_BATCH_SIZE:]
 
     payload: dict[str, Any] = {
         "parent": parent,
@@ -309,15 +316,15 @@ async def create_notion_page(
         )
 
         if resp.status_code != 200:
-            raise AppError("NOTION_009", detail=f"{resp.status_code} {resp.text}")
+            raise AppError(NOTION_PAGE_CREATION_FAILED, detail=f"{resp.status_code} {resp.text}")
 
         page = resp.json()
         page_id = page["id"]
         page_url = page.get("url", f"https://notion.so/{page_id.replace('-', '')}")
 
         # Append remaining blocks in batches of 100
-        for i in range(0, len(remaining), 100):
-            batch = remaining[i:i + 100]
+        for i in range(0, len(remaining), NOTION_BLOCK_BATCH_SIZE):
+            batch = remaining[i:i + NOTION_BLOCK_BATCH_SIZE]
             append_resp = await client.patch(
                 f"{NOTION_API_BASE}/blocks/{page_id}/children",
                 json={"children": batch},

@@ -1,19 +1,18 @@
 import logging
 from pathlib import Path
 from typing import Any
-from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader, BaseLoader
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 from memory.state import DocAgentState
-
-load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 # Project paths
 PROJECT_ROOT = Path(__file__).parent.parent
 PROMPTS_DIR = PROJECT_ROOT / "prompts"
+
+MAX_VISION_SCREENSHOTS = 20
 
 # Template loader
 _loader: BaseLoader = FileSystemLoader(PROMPTS_DIR)
@@ -46,7 +45,7 @@ def _build_vision_messages(state: DocAgentState, prompt_text: str) -> list[Human
     """
     content: list[dict[str, Any]] = [{"type": "text", "text": prompt_text}]
 
-    for i, shot in enumerate(state["screenshots"]):
+    for i, shot in enumerate(state["screenshots"][:MAX_VISION_SCREENSHOTS]):
         content.append({
             "type": "image_url",
             "image_url": {

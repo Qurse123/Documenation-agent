@@ -47,7 +47,6 @@ class SessionManager:
         self._state = {
             "screenshots": [],
             "transcript": "",
-            "is_recording": True,
             "documentation": "",
             "notion_page_url": "",
         }
@@ -85,13 +84,12 @@ class SessionManager:
         # Stop audio and get recording
         audio_recording = stop_recording()
 
-        # Transcribe the audio
+        # Transcribe the audio (run sync function off the event loop)
         logger.info("Transcribing audio...")
-        transcript = transcribe_audio(audio_recording["path"])
+        transcript = await asyncio.to_thread(transcribe_audio, audio_recording["path"])
 
         # Update state with final data
         self._state["transcript"] = transcript
-        self._state["is_recording"] = False
 
         captured_count = len(self._state["screenshots"])
         logger.info(

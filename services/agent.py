@@ -1,13 +1,9 @@
 import logging
 
-from dotenv import load_dotenv
-
 from managers.session_manager import SessionManager
 from services.doc_generator import generate_documentation
 from services.notion_service import publish_to_notion
 from memory.state import DocAgentState
-
-load_dotenv()
 
 logger = logging.getLogger(__name__)
 
