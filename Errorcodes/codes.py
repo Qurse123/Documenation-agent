@@ -53,7 +53,8 @@ ERROR_MESSAGES = {
     TRANSCRIPTION_FILE_READ: "Could not read audio file: {detail}",
     # Notion errors
     NOTION_NOT_CONFIGURED: (
-        "Notion not configured. Add NOTION_TOKEN to your .env file."
+        "Notion not configured. Set NOTION_CLIENT_ID, NOTION_CLIENT_SECRET, "
+        "and NOTION_REDIRECT_URI, then connect with OAuth."
     ),
     NOTION_FILE_UPLOAD_FAILED: "Failed to upload screenshot to Notion: {detail}",
     NOTION_PAGE_CREATION_FAILED: "Failed to create Notion page: {detail}",

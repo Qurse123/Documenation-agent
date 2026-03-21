@@ -27,6 +27,15 @@ export function getResult(): Promise<{ notion_url: string; documentation_markdow
   return request("/session/result")
 }
 
-export function getNotionStatus(): Promise<{ configured: boolean }> {
+export function getNotionStatus(): Promise<{
+  configured: boolean
+  oauth_configured: boolean
+  auth_url: string | null
+}> {
   return request("/notion/status")
+}
+
+export function startNotionOAuth(): Promise<void> {
+  window.open(`${BASE}/notion/oauth/start`, "_blank", "noopener,noreferrer")
+  return Promise.resolve()
 }

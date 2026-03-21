@@ -15,7 +15,7 @@ function NotionStatusRow({ notionReady }: { notionReady: boolean | null }) {
       ? "Checking Notion…"
       : notionReady
       ? "Notion ready"
-      : "Add NOTION_TOKEN to .env"
+      : "Configure Notion OAuth in .env"
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
