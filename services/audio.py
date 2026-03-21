@@ -6,7 +6,6 @@ from typing import Optional
 
 import numpy as np
 import sounddevice as sd
-from dotenv import load_dotenv
 from openai import (
     APIConnectionError,
     APIError,
@@ -31,8 +30,6 @@ from Errorcodes.codes import (
     TRANSCRIPTION_FILE_READ,
 )
 from memory.state import AudioRecording
-
-load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -59,14 +56,15 @@ def is_recording() -> bool:
     return _recording
 
 
-def _check_microphone_available() -> None:
-    """Verify a default input device exists and is usable. Raises AppError if not."""
+def _check_microphone_available() -> dict:
+    """Verify a default input device exists and is usable. Returns device info dict. Raises AppError if not."""
     try:
         default_input = sd.query_devices(kind="input")
         if default_input is None:
             raise AppError(AUDIO_NO_DEFAULT_MIC)
         if default_input.get("max_input_channels", 0) < _channels:
             raise AppError(AUDIO_CHANNELS_UNSUPPORTED, channels=_channels)
+        return default_input
     except sd.PortAudioError as e:
         raise AppError(AUDIO_SYSTEM_ACCESS) from e
 
@@ -78,16 +76,13 @@ def start_recording() -> None:
     if _recording:
         return  # Already recording
 
-    _check_microphone_available()
-
-    device_info = sd.query_devices(kind="input") ## we are only quering for avaliable devices that are inputs eg microphones no speakers (outputs)
+    device_info = _check_microphone_available()
     logger.info(
         "Using input device: '%s' (index %s, %d ch, %.0f Hz)",
         device_info.get("name", "unknown"),
         device_info.get("index", "?"),
         device_info.get("max_input_channels", 0),
         device_info.get("default_samplerate", 0),
-        "CHECKING TO SEE IF MIC IS WORKING"
     )
 
     _recording = True

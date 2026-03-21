@@ -8,11 +8,7 @@ No OAuth flow needed — just set NOTION_TOKEN in your .env file.
 import logging
 import os
 
-from dotenv import load_dotenv
-
 from Errorcodes.codes import AppError
-
-load_dotenv()
 
 logger = logging.getLogger(__name__)
 

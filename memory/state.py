@@ -15,7 +15,6 @@ class AudioRecording(TypedDict):
 
 class DocAgentState(TypedDict):
     screenshots: List[Screenshot]  ## list of Screenshot dicts (image_data, timestamp, description)
-    transcript: str                ## voice transcript  
-    is_recording: bool             ## memory should persist only when is_recording is set to true    
+    transcript: str                ## voice transcript
     documentation: str             ## AI generated documentation based on screenshot + transcript
     notion_page_url: str           ## URL of the published Notion page
