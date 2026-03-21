@@ -31,18 +31,19 @@
     border-color: hsl(var(--border));
   }
 
+  html,
   body {
     background-color: transparent;
     color: #FAFAFA;
     margin: 0;
     font-family: 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
+    overflow: hidden;
   }
 
   #root {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    min-height: 100%;
+    width: fit-content;
+    margin: 0;
   }
 }

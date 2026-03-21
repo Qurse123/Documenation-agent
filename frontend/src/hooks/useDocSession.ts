@@ -1,5 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react"
-import { startSession, stopSession, getStatus, getResult, getNotionStatus } from "@/lib/api"
+import {
+  startSession,
+  stopSession,
+  getStatus,
+  getResult,
+  getNotionStatus,
+  startNotionOAuth,
+} from "@/lib/api"
 
 export type Phase = "idle" | "recording" | "generating" | "ready"
 
@@ -8,6 +15,8 @@ export interface DocSessionState {
   notionUrl: string
   error: string | null
   notionReady: boolean | null
+  notionOAuthConfigured: boolean
+  connectNotion: () => Promise<void>
   startRecording: () => Promise<void>
   stopRecording: () => Promise<void>
   reset: () => void
@@ -18,12 +27,27 @@ export function useDocSession(): DocSessionState {
   const [notionUrl, setNotionUrl] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [notionReady, setNotionReady] = useState<boolean | null>(null)
+  const [notionOAuthConfigured, setNotionOAuthConfigured] = useState(false)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
+    let cancelled = false
+
     getNotionStatus()
-      .then(({ configured }) => setNotionReady(configured))
-      .catch(() => setNotionReady(false))
+      .then(({ configured, oauth_configured }) => {
+        if (cancelled) return
+        setNotionReady(configured)
+        setNotionOAuthConfigured(oauth_configured)
+      })
+      .catch(() => {
+        if (cancelled) return
+        setNotionReady(false)
+        setNotionOAuthConfigured(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   useEffect(() => {
@@ -76,5 +100,36 @@ export function useDocSession(): DocSessionState {
     setError(null)
   }, [])
 
-  return { phase, notionUrl, error, notionReady, startRecording, stopRecording, reset }
+  const connectNotion = useCallback(async () => {
+    await startNotionOAuth()
+    setError(null)
+
+    // Poll for OAuth completion after opening auth window.
+    for (let i = 0; i < 60; i += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      try {
+        const { configured, oauth_configured } = await getNotionStatus()
+        setNotionReady(configured)
+        setNotionOAuthConfigured(oauth_configured)
+        if (configured) {
+          break
+        }
+      } catch {
+        // Keep polling while callback window is completing.
+        continue
+      }
+    }
+  }, [])
+
+  return {
+    phase,
+    notionUrl,
+    error,
+    notionReady,
+    notionOAuthConfigured,
+    connectNotion,
+    startRecording,
+    stopRecording,
+    reset,
+  }
 }
