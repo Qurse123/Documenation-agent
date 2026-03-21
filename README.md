@@ -17,18 +17,17 @@ cp .env.example .env
 ```
 Open `.env` and fill in:
 - `OPENAI_API_KEY` — your OpenAI API key
-- `NOTION_TOKEN` — your Notion integration secret (see below)
-- `NOTION_PAGE_ID` — (optional) ID of the Notion page to post docs under
+- `NOTION_CLIENT_ID` — Notion OAuth Client ID
+- `NOTION_CLIENT_SECRET` — Notion OAuth Client Secret
+- `NOTION_REDIRECT_URI` — callback URL, must match your Notion settings exactly (example: `http://localhost:3000/callback`)
 
-**3. Create a Notion integration**
+**3. Create a Notion public integration**
 1. Go to [notion.so/my-integrations](https://www.notion.so/my-integrations)
-2. Click **New integration** → give it a name → click **Submit**
-3. Copy the **Internal Integration Secret** → paste as `NOTION_TOKEN` in `.env`
+2. Create a **Public** integration
+3. Copy your **OAuth Client ID** and **OAuth Client Secret** into `.env`
+4. Add your callback URL (for example `http://localhost:3000/callback`) to the integration's Redirect URIs
+5. Set the exact same URL as `NOTION_REDIRECT_URI` in `.env`
 
-**4. Share a Notion page with your integration**
-1. Open any Notion page where you want docs to appear
-2. Click `···` (top right) → **Connect to** → select your integration
-3. Copy the page ID from the URL (the part after the last `/`, before `?`) → paste as `NOTION_PAGE_ID` in `.env`
 
 **5. Run**
 ```bash
@@ -39,7 +38,13 @@ source venv/bin/activate && uvicorn api:app --reload
 cd frontend && npm run electron:dev
 ```
 
-The app opens as a floating overlay. The Notion status dot turns green once your token is detected. Click **Start Documentation Mode** to begin.
+**6. Connect Notion once per app session**
+1. In the floating app, click **Connect Notion**
+2. Complete OAuth in the browser
+3. Return to the app and wait for the Notion dot to turn green
+4. Click **Start Documentation Mode**
+
+If you see `ERR_CONNECTION_REFUSED` during OAuth callback, your backend is not running on the same host/port as `NOTION_REDIRECT_URI`.
 
 ---
 
@@ -83,8 +88,8 @@ The app opens as a floating overlay. The Notion status dot turns green once your
                       │
                       ▼
 ┌─────────────────────────────────────────────┐
-│  Notion MCP                                 │
-│  - Creates/updates documentation pages      │
+│  Notion API                                 │
+│  - Creates documentation pages              │
 └─────────────────────────────────────────────┘
 ```
 

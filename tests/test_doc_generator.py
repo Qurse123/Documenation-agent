@@ -19,7 +19,6 @@ def _make_state(screenshots=None, transcript="") -> DocAgentState:
     return {
         "screenshots": screenshots or [],
         "transcript": transcript,
-        "is_recording": False,
         "documentation": "",
         "notion_page_url": "",
     }

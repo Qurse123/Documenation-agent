@@ -1,13 +1,17 @@
 import logging
-import os
 import uuid
 from typing import Literal
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
+from dotenv import load_dotenv
 
 from services.agent import DocAgent
+from services import notion_auth
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 
@@ -96,5 +100,41 @@ async def get_result():
 
 @app.get("/notion/status")
 def notion_status():
-    configured = bool(os.getenv("NOTION_TOKEN"))
-    return {"configured": configured}
+    configured = notion_auth.oauth_mode_configured()
+    connected = notion_auth.has_ready_access_token()
+    auth_url = None
+    if not connected and notion_auth.oauth_mode_configured():
+        try:
+            auth_url = notion_auth.get_authorize_url(state="doc-agent")
+        except Exception:
+            auth_url = None
+    return {"configured": connected, "oauth_configured": configured, "auth_url": auth_url}
+
+
+@app.get("/notion/oauth/start")
+def notion_oauth_start():
+    try:
+        auth_url = notion_auth.get_authorize_url(state="doc-agent")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return RedirectResponse(url=auth_url)
+
+
+@app.get("/notion/oauth/callback")
+@app.get("/callback")
+async def notion_oauth_callback(code: str | None = None, error: str | None = None):
+    if error:
+        raise HTTPException(status_code=400, detail=f"Notion OAuth error: {error}")
+    if not code:
+        raise HTTPException(status_code=400, detail="Missing OAuth code")
+    try:
+        await notion_auth.exchange_code_for_token(code)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return HTMLResponse(
+        "<html><body style='font-family:sans-serif'>"
+        "<h3>Notion connected successfully.</h3>"
+        "<p>You can close this tab and return to Doc Agent.</p>"
+        "</body></html>"
+    )
