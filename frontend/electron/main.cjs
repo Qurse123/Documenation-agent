@@ -1,18 +1,21 @@
 const { app, BrowserWindow, screen, shell } = require("electron")
 
 function createWindow() {
-  const { width } = screen.getPrimaryDisplay().workAreaSize
+  const { x, y, width } = screen.getPrimaryDisplay().workArea
+  const WINDOW_WIDTH = 248
+  const WINDOW_HEIGHT = 240
+  const EDGE_MARGIN = -24
 
   const win = new BrowserWindow({
-    width: 340,
-    height: 240,
-    x: Math.round(width / 2 - 170),
-    y: 20,
+    width: WINDOW_WIDTH,
+    height: WINDOW_HEIGHT,
+    x: x + width - WINDOW_WIDTH - EDGE_MARGIN,
+    y: y + EDGE_MARGIN,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
     resizable: true,
-    minWidth: 240,
+    minWidth: 248,
     minHeight: 160,
     skipTaskbar: true,
     webPreferences: {
