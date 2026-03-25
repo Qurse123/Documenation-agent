@@ -1,3 +1,11 @@
+## Prerequisites
+
+- **macOS** — screen capture (PyAutoGUI) and audio (sounddevice) are macOS-only
+- **Python 3.10+**
+- **Node.js 18+** (for the Electron frontend)
+- **OpenAI API key** — for GPT-4o Vision and Whisper transcription
+- **Notion account** — for publishing documentation
+
 ## Overview
 AI Documentation Agent — records your screen, generates step-by-step docs with GPT-4o Vision, and publishes them to Notion.
 
@@ -29,6 +37,9 @@ Open `.env` and fill in:
 5. Set the exact same URL as `NOTION_REDIRECT_URI` in `.env`
 
 
+**4. Grant macOS permissions**
+On first run, macOS will prompt for Screen Recording and Microphone access. If you declined a prior prompt, grant access in **System Settings → Privacy & Security**, then restart the app.
+
 **5. Run**
 ```bash
 # Terminal 1 — backend
@@ -45,6 +56,17 @@ cd frontend && npm run electron:dev
 4. Click **Start Documentation Mode**
 
 If you see `ERR_CONNECTION_REFUSED` during OAuth callback, your backend is not running on the same host/port as `NOTION_REDIRECT_URI`.
+
+---
+
+## Development
+
+Run the test suite:
+```bash
+pytest
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for coding conventions and the PR workflow.
 
 ---
 
