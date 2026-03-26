@@ -43,7 +43,7 @@ On first run, macOS will prompt for Screen Recording and Microphone access. If y
 **5. Run**
 ```bash
 # Terminal 1 — backend
-source venv/bin/activate && uvicorn api:app --reload
+source venv/bin/activate && uvicorn services.APIs.api:app --reload
 
 # Terminal 2 — frontend
 cd frontend && npm run electron:dev
@@ -82,7 +82,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for coding conventions and the PR workflo
 4. GitHub Actions builds and packages the macOS `.dmg` automatically.
 5. The release appears at your repo's **Releases** page.
 
-> **Note:** The `.dmg` ships the Electron frontend. Users also need to run the Python backend locally (`uvicorn api:app --reload`). The app connects to `http://localhost:8000`.
+> **Note:** The `.dmg` ships the Electron frontend. Users also need to run the Python backend locally (`uvicorn services.APIs.api:app --reload`). The app connects to `http://localhost:8000`.
 
 ---
 
