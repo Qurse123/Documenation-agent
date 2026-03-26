@@ -6,16 +6,18 @@ Doc Agent is a Python app that records the user's screen (pyautogui) and voice, 
 
 ## Common commands
 
-- **Run a full doc session (record → transcribe → generate → publish):** `python main.py` (then Ctrl+C to stop and trigger pipeline).
+- **Run a full doc session (record → transcribe → generate → publish):** `python services/entrypoint/main.py` (then Ctrl+C to stop and trigger pipeline).
+- **Run the API server:** `uvicorn services.APIs.api:app --reload`
 - **Worker (idle process for externally triggered sessions):** `python worker.py`.
 - **Environment:** Ensure `.env` has required vars; run from project root with venv activated (`source venv/bin/activate`).
-- **Verification:** After editing the pipeline, run `python main.py` and trigger a short session with Ctrl+C to confirm docs and Notion publish.
+- **Verification:** After editing the pipeline, run `python services/entrypoint/main.py` and trigger a short session with Ctrl+C to confirm docs and Notion publish.
 
 ## Architecture and conventions
 
 **Directory map (source only):**
 
-- `main.py` — Entry point for full session; `worker.py` — Idle worker.
+- `services/entrypoint/main.py` — Entry point for full session; `worker.py` — Idle worker.
+- `services/APIs/api.py` — FastAPI server (used by the Electron frontend).
 - `services/` — Screenshot (`screenshot.py`), audio (`audio.py`), browser (`browser.py`), doc generation (`doc_generator.py`), Notion publish (`notion_service.py`), Notion OAuth (`notion_auth.py`).
 - `managers/session_manager.py` — Recording lifecycle (start/stop session, screenshot loop, transcript).
 - `memory/state.py` — TypedDicts: `Screenshot`, `DocAgentState` (screenshots in memory as base64 PNG, not on disk).

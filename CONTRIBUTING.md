@@ -39,13 +39,13 @@ cp .env.example .env
 
 **Backend API + frontend (recommended for development):**
 ```bash
-uvicorn api:app --reload         # backend
+uvicorn services.APIs.api:app --reload   # backend
 cd frontend && npm run electron:dev   # frontend (separate terminal)
 ```
 
 **One-shot session (no frontend):**
 ```bash
-python main.py   # press Ctrl+C to stop recording and trigger the pipeline
+python services/entrypoint/main.py   # press Ctrl+C to stop recording and trigger the pipeline
 ```
 
 **Idle worker (waits for external session triggers):**
@@ -60,12 +60,14 @@ python worker.py
 ```
 doc-agent/
 │   # Entry points (run these directly)
-├── main.py                 # One-shot session: record → transcribe → generate → publish
 ├── worker.py               # Idle worker for externally triggered sessions
-├── api.py                  # FastAPI server (used by the Electron frontend)
 │
 │   # Internal modules (imported by entry points, not run directly)
 ├── services/
+│   ├── entrypoint/
+│   │   └── main.py         # One-shot session: record → transcribe → generate → publish
+│   ├── APIs/
+│   │   └── api.py          # FastAPI server (used by the Electron frontend)
 │   ├── agent.py            # Main DocAgent orchestrator
 │   ├── screenshot.py       # Screen capture with change detection
 │   ├── audio.py            # Audio recording & Whisper transcription
@@ -107,7 +109,7 @@ doc-agent/
    git checkout -b your-feature-or-fix
    ```
 4. Make your changes, following the conventions above.
-5. Test manually: run a short session with `python main.py`, press Ctrl+C, and confirm docs appear in Notion.
+5. Test manually: run a short session with `python services/entrypoint/main.py`, press Ctrl+C, and confirm docs appear in Notion.
 6. Push to **your fork** and open a pull request against `main` on the original repo with a clear description of what changed and why.
 
 ## Reporting bugs / requesting features
