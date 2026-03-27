@@ -11,9 +11,9 @@ AI Documentation Agent — records your screen, generates step-by-step docs with
 
 ## Demo
 
-<video src="./DocAgent.mp4" controls width="900"></video>
+[![Demo](./docs/demo.gif)](./DocAgent.mp4)
 
-If the embedded player does not load, download the demo directly: [DocAgent.mp4](./DocAgent.mp4)
+Click to watch the full video.
 
 ## Setup
 
