@@ -9,6 +9,12 @@
 ## Overview
 AI Documentation Agent — records your screen, generates step-by-step docs with GPT-4o Vision, and publishes them to Notion. 
 
+## Demo
+
+<video src="./DocAgent.mp4" controls width="900"></video>
+
+If the embedded player does not load, download the demo directly: [DocAgent.mp4](./DocAgent.mp4)
+
 ## Setup
 
 **1. Clone and install**
